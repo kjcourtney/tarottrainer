@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tarot de Marseille Trainer v3.2</title>
+<style>
+  body { font-family: Arial, sans-serif; text-align: center; margin: 20px; background: #fdfdfd; }
+  h1 { margin-bottom: 10px; }
+  #cardImage { max-height: 400px; margin: 15px auto; display: block; }
+  .options, .modes { margin: 10px; }
+  button { margin: 5px; padding: 8px 14px; font-size: 14px; }
+  #progressBar { width: 100%; background: #eee; height: 20px; border-radius: 10px; overflow: hidden; margin: 10px 0; }
+  #progressFill { height: 100%; width: 0; background: #6a5acd; transition: width 0.3s; }
+  #feedback { font-size: 18px; margin: 10px; }
+  #multipleChoices button { display: block; margin: 6px auto; width: 220px; }
+</style>
+</head>
+<body>
+
+<h1>Tarot de Marseille Trainer v3.2</h1>
+
+<div class="modes">
+  <label>Question Mode:</label>
+  <select id="quizMode">
+    <option value="number">Number → Card</option>
+    <option value="card">Card → Number</option>
+    <option value="mixed">Mixed</option>
+  </select>
+  <label>Answer Mode:</label>
+  <select id="answerMode">
+    <option value="typing">Typing</option>
+    <option value="choice">Multiple Choice</option>
+  </select>
+  <label>Order:</label>
+  <select id="orderMode">
+    <option value="sequential">Sequential</option>
+    <option value="shuffle">Shuffle</option>
+  </select>
+</div>
+
+<div>
+  <button onclick="startSession()">Start / Reset</button>
+</div>
+
+<div id="progressBar"><div id="progressFill"></div></div>
+
+<div id="questionArea">
+  <h2 id="questionText">Press Start to Begin</h2>
+  <img id="cardImage" src="" style="display:none;">
+  <div id="answerArea"></div>
+</div>
+
+<div id="feedback"></div>
+
+<script>
+const cards = [
+  {
+    "num": "0",
+    "name": "Le Mat",
+    "eng": [
+      "Fool"
+    ],
+    "img": "images/Jean_Dodal_Tarot_trump_Fool.jpg"
+  },
+  {
+    "num": "I",
+    "name": "Le Bateleur",
+    "eng": [
+      "Magician"
+    ],
+    "img": "images/Jean_Dodal_Tarot_trump_01.jpg"
+  },
+  {
+    "num": "II",
+    "name": "La Papesse",
+    "eng": [
+      "High Priestess"
+    ],
+    "img": "images/Jean_Dodal_Tarot_trump_02.jpg"
+  },
+  {
+    "num": "III",
+    "name": "L’Impératrice",
+    "eng": [
+      "Empress"
+    ],
+    "img": "images/Jean_Dodal_Tarot_trump_03.jpg"
+  },
+  {
+    "num": "IV",
+    "name": "L’Empereur",
+    "eng": [
+      "Emperor"
+    ],
+    "img": "images/Jean_Dodal_Tarot_trump_04.jpg"
+  },
+  {
+    "num": "V",
+    "name": "Le Pape",
+    "eng": [
+      "Pope",
+      "Hierophant"
+    ],
+    "img": "images/Jean_Dodal_Tarot_trump_05.jpg"
+  },
+  {
+    "num": "VI",
+    "name": "L’Amoureux",
+    "eng": [
+      "Lovers"
+    ],
+    "img": "images/Jean_Dodal_Tarot_trump_06.jpg"
+  },
+  {
+    "num": "VII",
+    "name": "Le Chariot",
+    "eng": [
+      "Chariot"
+    ],
+    "img": "images/Jean_Dodal_Tarot_trump_07.jpg"
+  },
+  {
+    "num": "VIII",
+    "name": "Justice",
+    "eng": [
+      "Justice"
+    ],
+    "img": "images/Jean_Dodal_Tarot_trump_08.jpg"
+  },
+  {
+    "num": "VIIII",
+    "name": "L’Hermite",
+    "eng": [
+      "Hermit"
+    ],
+    "img": "images/Jean_Dodal_Tarot_trump_09.jpg"
+  },
+  {
+    "num": "X",
+    "name": "La Roue de Fortune",
+    "eng": [
+      "Wheel of Fortune"
+    ],
+    "img": "images/Jean_Dodal_Tarot_trump_10.jpg"
+  },
+  {
+    "num": "XI",
+    "name": "La Force",
+    "eng": [
+      "Strength"
+    ],
+    "img": "images/Jean_Dodal_Tarot_trump_11.jpg"
+  },
+  {
+    "num": "XII",
+    "name": "Le Pendu",
+    "eng": [
+      "Hanged Man"
+    ],
+    "img": "images/Jean_Dodal_Tarot_trump_12.jpg"
+  },
+  {
+    "num": "XIII",
+    "name": "La Mort",
+    "eng": [
+      "Death"
+    ],
+    "img": "images/Jean_Dodal_Tarot_trump_13.jpg"
+  },
+  {
+    "num": "XIIII",
+    "name": "Tempérance",
+    "eng": [
+      "Temperance"
+    ],
+    "img": "images/Jean_Dodal_Tarot_trump_14.jpg"
+  },
+  {
+    "num": "XV",
+    "name": "Le Diable",
+    "eng": [
+      "Devil"
+    ],
+    "img": "images/Jean_Dodal_Tarot_trump_15.jpg"
+  },
+  {
+    "num": "XVI",
+    "name": "La Maison Dieu",
+    "eng": [
+      "Tower"
+    ],
+    "img": "images/Jean_Dodal_Tarot_trump_16.jpg"
+  },
+  {
+    "num": "XVII",
+    "name": "L’Étoile",
+    "eng": [
+      "Star"
+    ],
+    "img": "images/Jean_Dodal_Tarot_trump_17.jpg"
+  },
+  {
+    "num": "XVIII",
+    "name": "La Lune",
+    "eng": [
+      "Moon"
+    ],
+    "img": "images/Jean_Dodal_Tarot_trump_18.jpg"
+  },
+  {
+    "num": "XVIIII",
+    "name": "Le Soleil",
+    "eng": [
+      "Sun"
+    ],
+    "img": "images/Jean_Dodal_Tarot_trump_19.jpg"
+  },
+  {
+    "num": "XX",
+    "name": "Le Jugement",
+    "eng": [
+      "Judgement"
+    ],
+    "img": "images/Jean_Dodal_Tarot_trump_20.jpg"
+  },
+  {
+    "num": "XXI",
+    "name": "Le Monde",
+    "eng": [
+      "World"
+    ],
+    "img": "images/Jean_Dodal_Tarot_trump_21.jpg"
+  }
+];
+
+let deck = [];
+let currentIndex = 0;
+let correct = 0;
+let attempts = 0;
+let streak = 0;
+let longestStreak = 0;
+let missedCards = [];
+
+function startSession(){
+  correct=0; attempts=0; streak=0; longestStreak=0; missedCards=[];
+  let order = document.getElementById('orderMode').value;
+  deck = [...cards];
+  if(order==='shuffle') deck.sort(()=>Math.random()-0.5);
+  currentIndex = 0;
+  nextQuestion();
+}
+
+function normalize(str){
+  return str.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu,"");
+}
+
+function checkAnswer(userAnswer, correctCard, mode){
+  attempts++;
+  let ua = normalize(userAnswer.trim());
+  let cn = normalize(correctCard.name);
+  let eng = correctCard.eng.map(e=>normalize(e));
+  let success=false;
+  if(mode==="number"){
+    success = (ua===normalize(correctCard.num.toLowerCase()));
+  } else {
+    success = (ua===cn || eng.includes(ua));
+  }
+  if(success){
+    correct++; streak++; if(streak>longestStreak) longestStreak=streak;
+    document.getElementById('feedback').innerHTML="<span style='color:green'>Correct!</span>";
+  } else {
+    streak=0;
+    missedCards.push(correctCard);
+    document.getElementById('feedback').innerHTML="<span style='color:red'>Wrong! Correct was: "+correctCard.num+" - "+correctCard.name+"</span>";
+  }
+  currentIndex++;
+  setTimeout(nextQuestion,1000);
+}
+
+function nextQuestion(){
+  if(currentIndex>=deck.length){
+    showSummary();
+    return;
+  }
+  updateProgress();
+  let quizMode = document.getElementById('quizMode').value;
+  let answerMode = document.getElementById('answerMode').value;
+  if(quizMode==='mixed'){
+    quizMode = Math.random()<0.5?'number':'card';
+  }
+  let card = deck[currentIndex];
+  let qText=document.getElementById('questionText');
+  let img=document.getElementById('cardImage');
+  let area=document.getElementById('answerArea');
+  area.innerHTML="";
+  document.getElementById('feedback').innerHTML="";
+  img.style.display="none";
+  if(quizMode==='number'){
+    qText.textContent="What card is "+card.num+" ?";
+    if(answerMode==='typing'){
+      area.innerHTML='<input id="ans" type="text" placeholder="Type card name"><button onclick="checkAnswer(document.getElementById(\'ans\').value, deck[currentIndex], \'card\')">Submit</button>';
+    } else {
+      let opts=[card,...getRandomOptions(card,3)];
+      opts.sort(()=>Math.random()-0.5);
+      opts.forEach(o=>{
+        let b=document.createElement("button");
+        b.textContent=o.name;
+        b.onclick=()=>checkAnswer(o.name, card, "card");
+        area.appendChild(b);
+      });
+    }
+  } else {
+    qText.textContent="What is this card's number?";
+    img.src=card.img;
+    img.style.display="block";
+    if(answerMode==='typing'){
+      area.innerHTML='<input id="ans" type="text" placeholder="Type number"><button onclick="checkAnswer(document.getElementById(\'ans\').value, deck[currentIndex], \'number\')">Submit</button>';
+    } else {
+      let opts=[card,...getRandomOptions(card,3)];
+      opts.sort(()=>Math.random()-0.5);
+      opts.forEach(o=>{
+        let b=document.createElement("button");
+        b.textContent=o.num;
+        b.onclick=()=>checkAnswer(o.num, card, "number");
+        area.appendChild(b);
+      });
+    }
+  }
+}
+
+function getRandomOptions(correctCard,n){
+  let pool=cards.filter(c=>c!==correctCard);
+  pool.sort(()=>Math.random()-0.5);
+  return pool.slice(0,n);
+}
+
+function updateProgress(){
+  let fill=document.getElementById('progressFill');
+  let pct=(currentIndex/deck.length)*100;
+  fill.style.width=pct+"%";
+}
+
+function showSummary(){
+  let accuracy = attempts?Math.round((correct/attempts)*100):0;
+  let msg="Session Complete!\nCorrect: "+correct+"/"+attempts+" ("+accuracy+"%)\nLongest Streak: "+longestStreak;
+  let choice=confirm(msg+"\n\nOK = Retry Missed (shuffled)\nCancel = Full Reset");
+  if(choice && missedCards.length>0){
+    deck=[...missedCards];
+    deck.sort(()=>Math.random()-0.5);
+    currentIndex=0; correct=0; attempts=0; streak=0; longestStreak=0; missedCards=[];
+    nextQuestion();
+  } else {
+    startSession();
+  }
+}
+</script>
+
+</body>
+</html>
