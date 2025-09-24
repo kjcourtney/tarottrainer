@@ -2,17 +2,19 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tarot de Marseille Trainer v3.2</title>
 <style>
-  body { font-family: Arial, sans-serif; text-align: center; margin: 20px; background: #fdfdfd; }
-  h1 { margin-bottom: 10px; }
-  #cardImage { max-height: 400px; margin: 15px auto; display: block; }
-  .options, .modes { margin: 10px; }
-  button { margin: 5px; padding: 8px 14px; font-size: 14px; }
-  #progressBar { width: 100%; background: #eee; height: 20px; border-radius: 10px; overflow: hidden; margin: 10px 0; }
+  body { font-family: -apple-system, system-ui, Segoe UI, Roboto, Arial, sans-serif; text-align: center; margin: 16px; background: #fdfdfd; font-size: 18px; }
+  h1 { margin-bottom: 12px; font-size: 26px; }
+  #cardImage { max-width: 92vw; max-height: 58vh; margin: 16px auto; display: block; border-radius: 10px; }
+  .options, .modes { margin: 12px; display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:center; }
+  button { margin: 6px; padding: 12px 18px; font-size: 18px; min-height: 44px; border-radius: 12px; background: linear-gradient(135deg,#6a5acd,#483d8b); color:#fff; border: none; }
+  select { font-size: 18px; padding: 10px 12px; min-height: 44px; border-radius: 10px; border:1px solid #d1d5db; }
+  #progressBar { width: 100%; background: #eee; height: 22px; border-radius: 12px; overflow: hidden; margin: 12px 0; }
   #progressFill { height: 100%; width: 0; background: #6a5acd; transition: width 0.3s; }
-  #feedback { font-size: 18px; margin: 10px; }
-  #multipleChoices button { display: block; margin: 6px auto; width: 220px; }
+  #feedback { font-size: 20px; margin: 12px; min-height: 28px; }
+  #multipleChoices button { display: block; margin: 8px auto; width: min(92vw, 440px); }
 </style>
 </head>
 <body>
@@ -24,17 +26,17 @@
   <select id="quizMode">
     <option value="number">Number → Card</option>
     <option value="card">Card → Number</option>
-    <option value="mixed">Mixed</option>
+    <option value="mixed" selected>Mixed</option>
   </select>
   <label>Answer Mode:</label>
   <select id="answerMode">
     <option value="typing">Typing</option>
-    <option value="choice">Multiple Choice</option>
+    <option value="choice" selected>Multiple Choice</option>
   </select>
   <label>Order:</label>
   <select id="orderMode">
     <option value="sequential">Sequential</option>
-    <option value="shuffle">Shuffle</option>
+    <option value="shuffle" selected>Shuffle</option>
   </select>
 </div>
 
